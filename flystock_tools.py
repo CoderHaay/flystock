@@ -661,6 +661,7 @@ def get_stock_stk_factor(code=None, trade_date=None, start_date=None, end_date=N
                 log('{} {} 数据已插入'.format(indicator.CODE, DateUtils.date_to_str2(indicator.DATE)))
 
         # 减去一天得到前一天日期
+        # trade_date = DateUtils.get_back_day_str(trade_date)
         trade_date = DateUtils.get_back_day_str(trade_date)
         count += 1
         log("等待6s ...")
@@ -717,9 +718,9 @@ def get_all_index_daily(trade_date=None, start_date=None, end_date=None):
 @calculate_time
 def main():
     # 特殊股票：兴华股份
-    log("***************** 1: 更新股票基本信息 ***************")
-    update_tu_ticker()
-    log("***************** 1: 更新股票基本信息 完成 ***************")
+    # log("***************** 1: 更新股票基本信息 ***************")
+    # update_tu_ticker()
+    # log("***************** 1: 更新股票基本信息 完成 ***************")
     #
     # log("***************** 2: 更新指数基本信息 入库 ***************")
     # update_index_basic()
@@ -751,14 +752,14 @@ def main():
     # get_moneyflow(trade_end_date)
     # log("***************** 6: 个股资金流向完成 ***************")
     #
-    # log("***************** 股票技术因子（量化因子）入库 ***************")
-    # start_date = "20230412"
-    # start_date = None
-    # end_date = "20220615"
-    # # end_date = None
-    # code = None
-    # get_stock_stk_factor(code=code, start_date=start_date, end_date=end_date)
-    # log("***************** 股票技术因子（量化因子）入库完成 ***************")
+    log("***************** 股票技术因子（量化因子）入库 ***************")
+    start_date = "20230412"
+    start_date = None
+    end_date = "20220612"
+    # end_date = None
+    code = None
+    get_stock_stk_factor(code=code, start_date=start_date, end_date=end_date)
+    log("***************** 股票技术因子（量化因子）入库完成 ***************")
 
     # log("***************** 沪深港通资金流向 ***************")
     # start_date = "20230406"
@@ -799,8 +800,8 @@ def multithreading_update_data():
 
 if __name__ == '__main__':
     tushareApi = TushareAPI()
-    engine = init_db_dev()
-    # engine = init_db_pre()
+    # engine = init_db_dev()
+    engine = init_db_pre()
     global_session = sessionmaker(bind=engine)()
 
     main()

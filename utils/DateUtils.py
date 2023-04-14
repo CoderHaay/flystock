@@ -4,8 +4,7 @@
 # @Email : haoyi@harmight.com
 # @File : DateUtils.py
 # @Project : 东方财富OCR
-import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class DateUtils(object):
@@ -53,7 +52,7 @@ class DateUtils(object):
         :return:
         """
         trade_date = DateUtils.str_to_date2(trade_date)
-        trade_date -= datetime.timedelta(days=1)
+        trade_date -= timedelta(days=1)
         trade_date = DateUtils.date_to_str2(trade_date)
         return trade_date
 
