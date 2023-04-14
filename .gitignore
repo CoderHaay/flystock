@@ -1,0 +1,11 @@
+/ppocr_img/
+/venv/
+/pretrain_models/
+/Scripts/
+/build/
+/myddz_best/
+/pyvenv.cfg
+.idea
+/Model/__pycache__/
+/utils/__pycache__/
+/__pycache__/
