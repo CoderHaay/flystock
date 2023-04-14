@@ -23,5 +23,5 @@ class HmTuIndexDaily(BaseModel):
     pct_chg = Column(Float, comment='涨跌幅（%）')
     vol = Column(Float, comment='成交量（手）')
     amount = Column(Float, comment='成交额（千元）')
-    update_time = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    UPDATE_TIME = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
                          comment='更新时间')

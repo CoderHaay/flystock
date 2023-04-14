@@ -262,7 +262,7 @@ def get_hsgt_money_flow(trade_date=None, start_date=None, end_date=None):
                 '%Y%m%d')
             continue
 
-        existing_Hsgt = global_session.query(HmTuMoneyflowHsgt).filter_by(date=trade_date).first()
+        existing_Hsgt = global_session.query(HmTuMoneyflowHsgt).filter_by(DATE=trade_date).first()
         if existing_Hsgt:
             start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
                 '%Y%m%d')
@@ -536,11 +536,10 @@ def get_margin_detail():
 
         # log(f'TS代码: {ticker.code}, 股票名称: {ticker.name}, 所属行业: {ticker.industry}, 上市日期: {ticker.list_date}')
         ts_code = "000001.SZ"
-        ts_code = ticker.code
 
-        ts_code = ticker.code
+        ts_code = ticker.CODE
         # 查询数据
-        result = global_session.query(HmTuMarginDetail).filter_by(code=ts_code).first()
+        result = global_session.query(HmTuMarginDetail).filter_by(CODE=ts_code).first()
         # 判断是否存在
         if result:
             log('{}存在'.format(ts_code))
@@ -752,23 +751,23 @@ def main():
     # get_moneyflow(trade_end_date)
     # log("***************** 6: 个股资金流向完成 ***************")
     #
-    log("***************** 股票技术因子（量化因子）入库 ***************")
-    start_date = "20230412"
-    start_date = None
-    end_date = "20220612"
-    # end_date = None
-    code = None
-    get_stock_stk_factor(code=code, start_date=start_date, end_date=end_date)
-    log("***************** 股票技术因子（量化因子）入库完成 ***************")
+    # log("***************** 股票技术因子（量化因子）入库 ***************")
+    # start_date = "20230412"
+    # start_date = None
+    # end_date = "20220511"
+    # # end_date = None
+    # code = None
+    # get_stock_stk_factor(code=code, start_date=start_date, end_date=end_date)
+    # log("***************** 股票技术因子（量化因子）入库完成 ***************")
 
     # log("***************** 沪深港通资金流向 ***************")
-    # start_date = "20230406"
+    # start_date = "20230413"
     # get_hsgt_money_flow(start_date=start_date)
     # log("***************** 沪深港通资金流向入库完成 ***************")
 
-    # log("***************** 融资融券交易明细入库 ***************")
-    # get_margin_detail()
-    # log("***************** 融资融券交易明细完成 ***************")
+    log("***************** 融资融券交易明细入库 ***************")
+    get_margin_detail()
+    log("***************** 融资融券交易明细完成 ***************")
 
     pass
 

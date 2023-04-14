@@ -46,7 +46,7 @@ class TushareAPI:
 
     def get_daily_basic(self, ts_code='', trade_date='', start_date='', end_date='', limit='', offset='', fields=None):
         """
-        每日指标
+        行情数据 - 每日指标
         """
         if fields is None:
             # fields = ["ts_code", "trade_date", "close", "turnover_rate", "turnover_rate_f", "volume_ratio", "pe",
@@ -134,7 +134,7 @@ class TushareAPI:
     def get_margin_detail(self, ts_code='', trade_date='', start_date='', end_date='', limit='', offset='',
                           fields=None):
         """
-        融资融券交易明细
+        市场参考数据 - 融资融券交易明细
         :param ts_code: 股票代码
         :param trade_date: 交易日期
         :param start_date: 开始日期

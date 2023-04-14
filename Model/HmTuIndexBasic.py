@@ -30,5 +30,5 @@ class HmTuIndexBasic(BaseModel):
     weight_rule = Column(String(255), comment='加权方式')
     desc = Column(String(255), comment='描述')
     exp_date = Column(String(255), comment='终止日期')
-    update_time = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    UPDATE_TIME = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
                          comment='更新时间')

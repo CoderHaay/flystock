@@ -27,4 +27,6 @@ class HmTuTicker(BaseModel):
     list_date = Column(Text)
     delist_date = Column(Text)
     is_hs = Column(Text)
-    update_time = Column(DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+    UPDATE_TIME = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                         comment='更新时间')
+
