@@ -246,41 +246,41 @@ def get_stock_daily_with_trade(trade_date=None):
         global_session.rollback()
 
 
-# trade_date  与 start_date 两个参数 二选一
-def get_hsgt_money_flow(trade_date=None, start_date=None, end_date=None):
-    # 获取 沪深港通资金流向
-    if end_date is None:
-        end_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-        log(end_date)
+def get_hsgt_money_flow(start_trade_date=None, end_trade_date=None):
+    log("***************** 8 沪深港通资金流向入库 ***************")
+    if start_trade_date is None:
+        start_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    if end_trade_date is None:
+        end_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    log("start_trade_date = {}, end_trade_date = {}".format(start_trade_date, end_trade_date))
     count = 0
-    while start_date <= end_date:
-
-        trade_date = start_date
+    trade_date = end_trade_date
+    while start_trade_date <= end_trade_date:
         result = is_trade_day(trade_date)
         if result is False:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
-
         existing_Hsgt = global_session.query(HmTuMoneyflowHsgt).filter_by(DATE=trade_date).first()
         if existing_Hsgt:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
 
-        log("************ {} ***********".format(start_date))
+        log("************ {} ***********".format(trade_date))
         count += 1
         if count > 295:
             log("************* 开始等待... *************")
             time.sleep(1)
             count = 0
 
-        data = tushareApi.get_moneyflow_hsgt(trade_date, start_date, end_date)
+        data = tushareApi.get_moneyflow_hsgt(trade_date=trade_date)
         # 将数据转换为 DataFrame 格式
         df = pd.DataFrame(data)
         if df.empty:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            log("沪深港通资金流向 {} 数据为空".format(trade_date))
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
         df = df.rename(columns={'trade_date': 'date'})
         print(df.head(1))
@@ -301,10 +301,14 @@ def get_hsgt_money_flow(trade_date=None, start_date=None, end_date=None):
         except Exception as e:
             # 处理异常的代码
             # log(f"发生了异常：{e}")
-            pass
+            global_session.rollback()
 
-        start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime('%Y%m%d')
+        trade_date = DateUtils.get_back_day_str(trade_date)
+        end_trade_date = trade_date
         time.sleep(0.22)
+
+    log("***************** 8 沪深港通资金流向入库完成 ***************")
+    global_session.close()
 
 
 def update_index_basic():
@@ -526,36 +530,37 @@ def get_moneyflow(trade_end_date=None):
     return
 
 
-def get_margin_detail():
-    ts_code = None
+def get_margin_detail(start_trade_date=None, end_trade_date=None):
+    log("***************** 融资融券交易明细入库a ***************")
+    # mult_session = Session()
+    if start_trade_date is None:
+        start_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    if end_trade_date is None:
+        end_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
 
-    tickers = global_session.query(HmTuTicker).all()
-    count = 0
-    # 遍历所有的HmTuTicker对象并打印
-    for ticker in tickers:
-
-        # log(f'TS代码: {ticker.code}, 股票名称: {ticker.name}, 所属行业: {ticker.industry}, 上市日期: {ticker.list_date}')
-        ts_code = "000001.SZ"
-
-        ts_code = ticker.CODE
-        # 查询数据
-        result = global_session.query(HmTuMarginDetail).filter_by(CODE=ts_code).first()
-        # 判断是否存在
-        if result:
-            log('{}存在'.format(ts_code))
+    log("start_trade_date = {}, end_trade_date = {}".format(start_trade_date, end_trade_date))
+    trade_date = end_trade_date
+    while start_trade_date <= end_trade_date:
+        log("************ {} ************".format(trade_date))
+        result = is_trade_day(trade_date)
+        if result is False:
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
 
-        if count > 198:
-            log('*********** 等待 ***********')
-            count = 0
-            time.sleep(60)
-        trade_date = None
-        data = tushareApi.get_margin_detail(ts_code=ts_code, trade_date=trade_date)
-        count += 1
+        result = global_session.query(HmTuMarginDetail).filter_by(DATE=trade_date).first()
+        # 判断是否存在
+        if result:
+            log('{} 数据已存在存在'.format(trade_date))
+            break
+
+        data = tushareApi.get_margin_detail(trade_date=trade_date)
         # 将数据转换为 DataFrame 格式
         df = pd.DataFrame(data)
         if df.empty:
-            log('{}: 为空'.format(ts_code))
+            log('融资融券交易明细 {}: 数据为空'.format(trade_date))
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
         df = df.replace(np.nan, None)
         df = df.rename(columns={'ts_code': 'code'})
@@ -575,9 +580,13 @@ def get_margin_detail():
         except Exception as e:
             # 处理异常的代码
             log(f"发生了异常：{e}")
-            continue
-        time.sleep(0.5)
+            global_session.rollback()
 
+        trade_date = DateUtils.get_back_day_str(trade_date)
+        end_trade_date = trade_date
+
+    global_session.close()
+    log("***************** 融资融券交易明细入库 完成 ***************")
 
 
 # 沪深股票 - 特色数据 -  股票技术面因子
@@ -760,41 +769,19 @@ def main():
     # get_stock_stk_factor(code=code, start_date=start_date, end_date=end_date)
     # log("***************** 股票技术因子（量化因子）入库完成 ***************")
 
-    # log("***************** 沪深港通资金流向 ***************")
-    # start_date = "20230413"
-    # get_hsgt_money_flow(start_date=start_date)
-    # log("***************** 沪深港通资金流向入库完成 ***************")
+    log("***************** 沪深港通资金流向 ***************")
+    start_trade_date = "20230414"
+    end_trade_date = "20230414"
+    get_hsgt_money_flow(start_trade_date, end_trade_date)
+    log("***************** 沪深港通资金流向入库完成 ***************")
 
-    log("***************** 融资融券交易明细入库 ***************")
-    get_margin_detail()
-    log("***************** 融资融券交易明细完成 ***************")
+    # log("***************** 融资融券交易明细入库 ***************")
+    # start_trade_date = "20230414"
+    # end_trade_date = "20230414"
+    # get_margin_detail(start_trade_date, end_trade_date)
+    # log("***************** 融资融券交易明细完成 ***************")
 
     pass
-
-
-def multithreading_update_data():
-    # 创建多个线程并启动
-    threads = []
-    # 创建Session对象
-    mult_session = scoped_session(Session)
-    # 创建线程并启动
-    t = threading.Thread(target=update_tu_ticker, args=(mult_session,))
-    threads.append(t)
-    t.start()
-
-    # 创建Session对象
-    mult_session = scoped_session(Session)
-    # 创建线程并启动
-    t = threading.Thread(target=update_index_basic, args=(mult_session,))
-    threads.append(t)
-    t.start()
-
-    # 创建Session对象
-    mult_session = scoped_session(Session)
-    # 创建线程并启动
-    t = threading.Thread(target=update_trade_date, args=(mult_session,))
-    threads.append(t)
-    t.start()
 
 
 if __name__ == '__main__':

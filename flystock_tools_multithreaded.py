@@ -209,23 +209,19 @@ def is_trade_day(now_date):
 
 
 # 获取股票每日交易数据
-def get_stock_daily(code=None, trade_date=None, start_date=None, end_date=None):
-    if trade_date is None:
-        trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-    if start_date is None:
-        start_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-    if end_date is None:
-        end_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-
+def get_stock_daily(code=None, start_trade_date=None, end_trade_date=None):
+    if start_trade_date is None:
+        start_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    if end_trade_date is None:
+        end_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    log("start_trade_date = {}, end_trade_date = {}".format(start_trade_date, end_trade_date))
     count = 0
-    log("trade_date = {}, start_date = {}, end_state = {}".format(trade_date, start_date, end_date))
-    while start_date <= end_date:
-        log("************ {} ************".format(start_date))
-        trade_date = start_date
+    trade_date = end_trade_date
+    while start_trade_date <= end_trade_date:
         result = is_trade_day(trade_date)
         if result is False:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
         count += 1
         if count > 500:
@@ -237,8 +233,8 @@ def get_stock_daily(code=None, trade_date=None, start_date=None, end_date=None):
         # 将数据转换为 DataFrame 格式
         df = pd.DataFrame(data)
         if df.empty:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
+            end_trade_date = trade_date
             continue
 
         df = df.rename(columns={'trade_date': 'date'})
@@ -261,7 +257,8 @@ def get_stock_daily(code=None, trade_date=None, start_date=None, end_date=None):
             # 处理异常的代码
             log(f"发生了异常：{e}")
             Session.rollback()
-        start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime('%Y%m%d')
+        trade_date = DateUtils.get_back_day_str(trade_date)
+        end_trade_date = trade_date
         time.sleep(0.15)
 
 
@@ -311,31 +308,28 @@ def get_stock_daily_with_trade(trade_date=None):
 
 
 # trade_date  与 start_date 两个参数 二选一
-def get_hsgt_money_flow(trade_date=None, start_date=None, end_date=None):
+def get_hsgt_money_flow(start_trade_date=None, end_trade_date=None):
     log("***************** 8 沪深港通资金流向入库 ***************")
     mult_session = Session()
-    # 获取 沪深港通资金流向
-    if start_date is None:
-        start_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-    if end_date is None:
-        end_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-        log(end_date)
+    if start_trade_date is None:
+        start_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    if end_trade_date is None:
+        end_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    log("start_trade_date = {}, end_trade_date = {}".format(start_trade_date, end_trade_date))
     count = 0
-    while start_date <= end_date:
-        trade_date = start_date
+    log("start_trade_date = {}, end_trade_date = {}".format(start_trade_date, end_trade_date))
+    trade_date = end_trade_date
+    while start_trade_date <= end_trade_date:
         result = is_trade_day(trade_date)
         if result is False:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
             continue
-
         existing_Hsgt = mult_session.query(HmTuMoneyflowHsgt).filter_by(DATE=trade_date).first()
         if existing_Hsgt:
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
             continue
 
-        log("************ {} ***********".format(start_date))
+        log("************ {} ***********".format(trade_date))
         count += 1
         if count > 295:
             log("************* 开始等待... *************")
@@ -347,8 +341,7 @@ def get_hsgt_money_flow(trade_date=None, start_date=None, end_date=None):
         df = pd.DataFrame(data)
         if df.empty:
             log("沪深港通资金流向 {} 数据为空".format(trade_date))
-            start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime(
-                '%Y%m%d')
+            trade_date = DateUtils.get_back_day_str(trade_date)
             continue
         df = df.rename(columns={'trade_date': 'date'})
         print(df.head(1))
@@ -371,7 +364,7 @@ def get_hsgt_money_flow(trade_date=None, start_date=None, end_date=None):
             # log(f"发生了异常：{e}")
             mult_session.rollback()
 
-        start_date = (datetime.datetime.strptime(start_date, '%Y%m%d') + datetime.timedelta(days=1)).strftime('%Y%m%d')
+        trade_date = DateUtils.get_back_day_str(trade_date)
         time.sleep(0.22)
 
     log("***************** 8 沪深港通资金流向入库完成 ***************")
@@ -548,16 +541,18 @@ def get_moneyflow(trade_end_date=None):
     return
 
 
-def get_margin_detail(start_date=None, end_date=None):
+def get_margin_detail(start_trade_date=None, end_trade_date=None):
     log("***************** 融资融券交易明细入库 ***************")
     mult_session = Session()
-    if start_date is None:
-        start_date = DateUtils.date_to_str2(DateUtils.get_current_time())
-    if end_date is None:
-        end_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    if start_trade_date is None:
+        start_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
+    if end_trade_date is None:
+        end_trade_date = DateUtils.date_to_str2(DateUtils.get_current_time())
 
-    trade_date = end_date
-    while start_date <= end_date:
+    log("start_trade_date = {}, end_trade_date = {}".format(start_trade_date, end_trade_date))
+    trade_date = end_trade_date
+    while start_trade_date <= end_trade_date:
+        log("************ {} ************".format(trade_date))
         result = is_trade_day(trade_date)
         if result is False:
             trade_date = DateUtils.get_back_day_str(trade_date)
@@ -612,7 +607,7 @@ def get_stock_stk_factor(end_date=None):
         log("默认结束日为:{}".format(end_date))
     count = 0
     wait_count = 0
-    max_request = 1  # 每天天最多请求次数
+    max_request = 50  # 每天天最多请求次数
     # 循环打印10天日期列表
     trade_date = DateUtils.str_to_date2(end_date)
     while count < max_request:
@@ -673,7 +668,7 @@ def get_stock_stk_factor(end_date=None):
                 existing_indicator.CCI = row['cci']
                 mult_session.merge(existing_indicator)
                 mult_session.commit()
-                # log('{} {} 股票技术因子数据已更新'.format(indicator.CODE, indicator.DATE))
+                log('{} {} 股票技术因子数据已更新'.format(indicator.CODE, indicator.DATE))
             except Exception as e:
                 # 如果不存在，则插入数据
                 mult_session.add(indicator)
@@ -746,10 +741,10 @@ def multithreading_update_data():
     threads = []
 
     # 创建线程并启动
-    t0 = threading.Thread(target=update_ticker)
-    threads.append(t0)
-    t1 = threading.Thread(target=update_tu_ticker)
-    threads.append(t1)
+    # t0 = threading.Thread(target=update_ticker)
+    # threads.append(t0)
+    # t1 = threading.Thread(target=update_tu_ticker)
+    # threads.append(t1)
     #
     # t2 = threading.Thread(target=update_index_basic)
     # threads.append(t2)
@@ -769,18 +764,18 @@ def multithreading_update_data():
     # t5 = threading.Thread(target=get_all_index_daily, args=(start_date, end_date))
     # threads.append(t5)
 
-
     # #  ***************** 6: 个股资金流向 ***************
     # trade_end_date = None
     # # trade_end_date = "20230409"
     # t6 = threading.Thread(target=get_moneyflow, args=(trade_end_date,))
     # threads.append(t6)
     #
-    # # log("***************** 7 股票技术因子（量化因子）入库 ***************")
-    # trade_end_date = "20220615"
+    # log("***************** 7 股票技术因子（量化因子）入库 ***************")
+    trade_end_date = "20220511"
+    # trade_end_date = "20230414"
     # trade_end_date = None
-    # t7 = threading.Thread(target=get_stock_stk_factor, args=(trade_end_date,))
-    # threads.append(t7)
+    t7 = threading.Thread(target=get_stock_stk_factor, args=(trade_end_date,))
+    threads.append(t7)
     #
     # **************** 沪深港通资金流向 ***************
     # t8 = threading.Thread(target=get_hsgt_money_flow)
