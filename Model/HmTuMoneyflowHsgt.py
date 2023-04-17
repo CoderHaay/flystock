@@ -16,11 +16,11 @@ class HmTuMoneyflowHsgt(BaseModel):
 
     # date = Column(Date, comment='交易日期')
     DATE = Column(String(255), comment='交易日期')
-    ggt_ss = Column(Numeric(16, 2), comment='港股通（上海）')
-    ggt_sz = Column(Numeric(16, 2), comment='港股通（深圳）')
-    hgt = Column(Numeric(16, 2), comment='沪股通(元) 原值为百万，转换为元')
-    sgt = Column(Numeric(16, 2), comment='深股通(元) 原值为百万，转换为元')
-    north_money = Column(Numeric(16, 2), comment='北向资金(元) 原值为百万，转换为元')
-    south_money = Column(Numeric(16, 2), comment='南向资金(元) 原值为百万，转换为元')
-    update_time = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    GGT_SS = Column(Numeric(16, 2), comment='港股通（上海）')
+    GGT_SZ = Column(Numeric(16, 2), comment='港股通（深圳）')
+    HGT = Column(Numeric(16, 2), comment='沪股通(元) 原值为百万，转换为元')
+    SGT = Column(Numeric(16, 2), comment='深股通(元) 原值为百万，转换为元')
+    NORTH_MONEY = Column(Numeric(16, 2), comment='北向资金(元) 原值为百万，转换为元')
+    SOUTH_MONEY = Column(Numeric(16, 2), comment='南向资金(元) 原值为百万，转换为元')
+    UPDATE_TIME = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
                          comment='更新时间')

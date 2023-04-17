@@ -3,5 +3,5 @@
   "host": "localhost",
   "user": "root",
   "password": "111111",
-  "db_name": "flystock"
+  "db_name": "flystock_local"
 }

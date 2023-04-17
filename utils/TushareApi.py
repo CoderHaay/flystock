@@ -25,7 +25,7 @@ class TushareAPI:
         :return: pandas.DataFrame
         """
         if fields is None:
-            fields = ["ts_code", "symbol", "name", "area", "industry", "fullname",
+            fields = ["ts_code", "symbol", "name", "area", "industry", "FULLNAME",
                       "enname", "cnspell", "market", "exchange", "curr_type",
                       "list_status", "list_date", "delist_date", "is_hs"
                       ]
@@ -167,7 +167,7 @@ class TushareAPI:
         """
         if fields is None:
             fields = ["ts_code", "name", "market", "publisher", "category", "base_date", "base_point", "list_date",
-                      "fullname", "index_type", "weight_rule", "desc", "exp_date"]
+                      "FULLNAME", "index_type", "weight_rule", "desc", "exp_date"]
 
         return self.pro.index_basic(ts_code=ts_code, market=market, publisher=publisher, category=category, name=name,
                                     limit=limit, offset=offset, fields=fields)

@@ -16,7 +16,6 @@ from Model.HmTuMarginDetail import HmTuMarginDetail
 from Model.HmTuMoneyflow import HmTuMoneyflow
 from Model.HmTuQuotationDay import HmTuQuotationDay
 from Model.HmTuMoneyflowHsgt import HmTuMoneyflowHsgt
-from Model.HmTuStkFactor import HmTuStkFactor
 from Model.HmTuTicker import HmTuTicker
 from utils.DateUtils import DateUtils
 from utils.TushareApi import TushareAPI
@@ -98,38 +97,38 @@ def update_tu_ticker():
     for _, row in df.iterrows():
         new_record = HmTuTicker(
             CODE=row['code'],
-            symbol=row['symbol'],
+            SYMBOL=row['symbol'],
             NAME=row['name'],
-            area=row['area'],  # 地域
-            industry=row['industry'],  # 所属行业
-            fullname=row['fullname'],  # 股票全称
-            enname=row['enname'],  # 英文全称
-            cnspell=row['cnspell'],  # 拼音缩写
-            market=row['market'],  # 市场类型
-            exchange=row['exchange'],  # 交易所代码
-            curr_type=row['curr_type'],  # 交易货币
-            list_status=row['list_status'],  # 上市状态
-            list_date=row['list_date'],  # 上市日期
-            delist_date=row['delist_date'],  # 退市日期
-            is_hs=row['is_hs'],  # 是否沪深港通标的
+            AREA=row['area'],  # 地域
+            INDUSTRY=row['industry'],  # 所属行业
+            FULLNAME=row['FULLNAME'],  # 股票全称
+            ENNAME=row['enname'],  # 英文全称
+            CNSPELL=row['cnspell'],  # 拼音缩写
+            MARKET=row['market'],  # 市场类型
+            EXCHANGE=row['exchange'],  # 交易所代码
+            CURR_TYPE=row['curr_type'],  # 交易货币
+            LIST_STATUS=row['list_status'],  # 上市状态
+            LIST_DATE=row['list_date'],  # 上市日期
+            DELIST_DATE=row['delist_date'],  # 退市日期
+            IS_HS=row['is_hs'],  # 是否沪深港通标的
         )
 
         try:
             record = mult_session.query(HmTuTicker).filter_by(CODE=row['code']).first()
-            record.symbol = row['symbol']
+            record.SYMBOL = row['symbol']
             record.NAME = row['name']
-            record.area = row['area']
-            record.industry = row['industry']
-            record.fullname = row['fullname']
-            record.enname = row['enname']
-            record.cnspell = row['cnspell']
-            record.market = row['market']
-            record.exchange = row['exchange']
-            record.curr_type = row['curr_type']
-            record.list_status = row['list_status']
-            record.list_date = row['list_date']
-            record.delist_date = row['delist_date']
-            record.is_hs = row['is_hs']
+            record.AREA = row['area']
+            record.INDUSTRY = row['industry']
+            record.FULLNAME = row['FULLNAME']
+            record.ENNAME = row['enname']
+            record.CNSPELL = row['cnspell']
+            record.MARKET = row['market']
+            record.EXCHANGE = row['exchange']
+            record.CURR_TYPE = row['curr_type']
+            record.LIST_STATUS = row['list_status']
+            record.LIST_DATE = row['list_date']
+            record.DELIST_DATE = row['delist_date']
+            record.IS_HS = row['is_hs']
             mult_session.merge(record)
             mult_session.commit()
             log("股票基本信息 更新中...")
@@ -140,12 +139,12 @@ def update_tu_ticker():
 
         new_hm_ticker = HmTicker(
             CODE=row['code'],
-            list_status=row['list_status'],  # 上市状态
+            LIST_STATUS=row['list_status'],  # 上市状态
         )
 
         try:
             record = mult_session.query(HmTicker).filter_by(CODE=row['code']).first()
-            record.list_status = row['list_status']
+            record.LIST_STATUS = row['list_status']
             mult_session.merge(record)
             mult_session.commit()
         except Exception as e:
@@ -244,10 +243,10 @@ def get_stock_daily(code=None, start_trade_date=None, end_trade_date=None):
         # log("df = {}".format(df))
         daily_data_list = []
         for index, row in df.iterrows():
-            model = HmTuQuotationDay(CODE=row['code'], DATE=row['date'], open=row["open"], high=row["high"],
-                                     low=row["low"],
-                                     close=row["close"], pre_close=row["pre_close"], change=row["change"],
-                                     pct_chg=row["pct_chg"], vol=row["vol"], amount=row["amount"])
+            model = HmTuQuotationDay(CODE=row['code'], DATE=row['date'], OPEN=row["open"], HIGH=row["high"],
+                                     LOW=row["low"], CLOSE=row["close"], PRE_CLOSE=row["pre_close"],
+                                     CHANGE=row["change"],
+                                     PCT_CHG=row["pct_chg"], VOL=row["vol"], AMOUNT=row["amount"])
             daily_data_list.append(model)
 
         Session.add_all(daily_data_list)
@@ -290,10 +289,9 @@ def get_stock_daily_with_trade(trade_date=None):
     # log("df = {}".format(df))
     daily_data_list = []
     for index, row in df.iterrows():
-        model = HmTuQuotationDay(CODE=row['code'], DATE=row['date'], open=row["open"], high=row["high"],
-                                 low=row["low"],
-                                 close=row["close"], pre_close=row["pre_close"], change=row["change"],
-                                 pct_chg=row["pct_chg"], vol=row["vol"], amount=row["amount"])
+        model = HmTuQuotationDay(CODE=row['code'], DATE=row['date'], OPEN=row["open"], HIGH=row["high"],
+                                 LOW=row["low"], CLOSE=row["close"], PRE_CLOSE=row["pre_close"], CHANGE=row["change"],
+                                 PCT_CHG=row["pct_chg"], VOL=row["vol"], AMOUNT=row["amount"])
         daily_data_list.append(model)
 
     mult_session.add_all(daily_data_list)
@@ -348,12 +346,12 @@ def get_hsgt_money_flow(start_trade_date=None, end_trade_date=None):
         hsgt_list = []
         for index, row in df.iterrows():
             model = HmTuMoneyflowHsgt(DATE=row['date'],
-                                      ggt_ss=Utils.convert_value(row['ggt_ss'], 1000000),
-                                      ggt_sz=Utils.convert_value(row['ggt_sz'], 1000000),
-                                      hgt=Utils.convert_value(row['hgt'], 1000000),
-                                      sgt=Utils.convert_value(row['sgt'], 1000000),
-                                      north_money=Utils.convert_value(row['north_money'], 1000000),
-                                      south_money=Utils.convert_value(row['south_money'], 1000000))
+                                      GGT_SS=Utils.convert_value(row['ggt_ss'], 1000000),
+                                      GGT_SZ=Utils.convert_value(row['ggt_sz'], 1000000),
+                                      HGT=Utils.convert_value(row['hgt'], 1000000),
+                                      SGT=Utils.convert_value(row['sgt'], 1000000),
+                                      NORTH_MONEY=Utils.convert_value(row['north_money'], 1000000),
+                                      SOUTH_MONEY=Utils.convert_value(row['south_money'], 1000000))
             hsgt_list.append(model)
 
         mult_session.add_all(hsgt_list)
@@ -391,33 +389,33 @@ def update_index_basic():
         new_record = HmTuIndexBasic(
             CODE=row['code'],
             NAME=row['name'],
-            fullname=row['fullname'],
-            market=row['market'],
-            publisher=row['publisher'],
-            index_type=row['index_type'],
-            category=row['category'],
-            base_date=row['base_date'],
-            base_point=row['base_point'],
-            list_date=row['list_date'],
-            weight_rule=row['weight_rule'],
-            desc=row['desc'],
-            exp_date=row['exp_date']
+            FULLNAME=row['FULLNAME'],
+            MARKET=row['market'],
+            PUBLISHER=row['publisher'],
+            INDEX_TYPE=row['index_type'],
+            CATEGORY=row['category'],
+            BASE_DATE=row['base_date'],
+            BASE_POINT=row['base_point'],
+            LIST_DATE=row['list_date'],
+            WEIGHT_RULE=row['weight_rule'],
+            DESC=row['desc'],
+            EXP_DATE=row['exp_date']
         )
         try:
             # 查询记录
             record = mult_session.query(HmTuIndexBasic).filter_by(CODE=row['code']).one()
             record.NAME = row['name']
-            record.fullname = row['fullname']
-            record.market = row['market']
-            record.publisher = row['publisher']
-            record.index_type = row['index_type']
-            record.category = row['category']
-            record.base_date = row['base_date']
-            record.base_point = row['base_point']
-            record.list_date = row['list_date']
-            record.weight_rule = row['weight_rule']
-            record.desc = row['desc']
-            record.exp_date = row['exp_date']
+            record.FULLNAME = row['fullname']
+            record.MARKET = row['market']
+            record.PUBLISHER = row['publisher']
+            record.INDEX_TYPE = row['index_type']
+            record.CATEGORY = row['category']
+            record.BASE_DATE = row['base_date']
+            record.BASE_POINT = row['base_point']
+            record.LIST_DATE = row['list_date']
+            record.WEIGHT_RULE = row['weight_rule']
+            record.DESC = row['desc']
+            record.EXP_DATE = row['exp_date']
             mult_session.merge(record)
             mult_session.commit()
             log("指数基本信息 更新中...")
@@ -506,24 +504,24 @@ def get_moneyflow(trade_end_date=None):
         print(df.head(1))
         hsgt_list = []
         for index, row in df.iterrows():
-            model = HmTuMoneyflow(CODE=row['code'], DATE=row['date'], buy_sm_vol=row['buy_sm_vol'],
-                                  buy_sm_amount=Utils.convert_value(row['buy_sm_amount']),
-                                  sell_sm_vol=row['sell_sm_vol'],
-                                  sell_sm_amount=Utils.convert_value(row['sell_sm_amount']),
-                                  buy_md_vol=row['buy_md_vol'],
-                                  buy_md_amount=Utils.convert_value(row['buy_md_amount']),
-                                  sell_md_vol=row['sell_md_vol'],
-                                  sell_md_amount=Utils.convert_value(row['sell_md_amount']),
-                                  buy_lg_vol=row['buy_lg_vol'],
-                                  buy_lg_amount=Utils.convert_value(row['buy_lg_amount']),
-                                  sell_lg_vol=row['sell_lg_vol'],
-                                  sell_lg_amount=Utils.convert_value(row['sell_lg_amount']),
-                                  buy_elg_vol=row['buy_elg_vol'],
-                                  buy_elg_amount=Utils.convert_value(row['buy_elg_amount']),
-                                  sell_elg_vol=row['sell_elg_vol'],
-                                  sell_elg_amount=Utils.convert_value(row['sell_elg_amount']),
-                                  net_mf_vol=row['net_mf_vol'],
-                                  net_mf_amount=Utils.convert_value(row['net_mf_amount']))
+            model = HmTuMoneyflow(CODE=row['code'], DATE=row['date'], BUY_SM_VOL=row['buy_sm_vol'],
+                                  BUY_SM_AMOUNT=Utils.convert_value(row['buy_sm_amount']),
+                                  SELL_SM_VOL=row['sell_sm_vol'],
+                                  SELL_SM_AMOUNT=Utils.convert_value(row['sell_sm_amount']),
+                                  BUY_MD_VOL=row['buy_md_vol'],
+                                  BUY_MD_AMOUNT=Utils.convert_value(row['buy_md_amount']),
+                                  SELL_MD_VOL=row['sell_md_vol'],
+                                  SELL_MD_AMOUNT=Utils.convert_value(row['sell_md_amount']),
+                                  BUY_LG_VOL=row['buy_lg_vol'],
+                                  BUY_LG_AMOUNT=Utils.convert_value(row['buy_lg_amount']),
+                                  SELL_LG_VOL=row['sell_lg_vol'],
+                                  SELL_LG_AMOUNT=Utils.convert_value(row['sell_lg_amount']),
+                                  BUY_ELG_VOL=row['buy_elg_vol'],
+                                  BUY_ELG_AMOUNT=Utils.convert_value(row['buy_elg_amount']),
+                                  SELL_ELG_VOL=row['sell_elg_vol'],
+                                  SELL_ELG_AMOUNT=Utils.convert_value(row['sell_elg_amount']),
+                                  NET_MF_VOL=row['net_mf_vol'],
+                                  NET_MF_AMOUNT=Utils.convert_value(row['net_mf_amount']))
             hsgt_list.append(model)
 
         mult_session.add_all(hsgt_list)
@@ -578,9 +576,9 @@ def get_margin_detail(start_trade_date=None, end_trade_date=None):
         hsgt_list = []
         for index, row in df.iterrows():
             model = HmTuMarginDetail(CODE=row['code'], DATE=row['date'], NAME=row['name'],
-                                     rzye=row['rzye'], rqye=row['rqye'], rzmre=row['rzmre'],
-                                     rqyl=row['rqyl'], rzche=row['rzche'], rqchl=row['rqchl'],
-                                     rqmcl=row['rqmcl'], rzrqye=row['rzrqye'], )
+                                     RZYE=row['rzye'], RQYE=row['rqye'], RZMRE=row['rzmre'],
+                                     RQYL=row['rqyl'], RZCHE=row['rzche'], RQCHL=row['rqchl'],
+                                     RQMCL=row['rqmcl'], RZRQYE=row['rzrqye'])
             hsgt_list.append(model)
 
         mult_session.add_all(hsgt_list)
@@ -642,12 +640,10 @@ def get_stock_stk_factor(end_date=None):
         log("数据长度为:{}".format(len(df)))
         for index, row in df.iterrows():
             indicator = HmIndicatorDay(CODE=row['code'], DATE=row['date'], DIF=row['dif'],
-                                       DEA=row['dea'], MACD=row['macd'],
-                                       KDJ_K=row['kdj_k'], KDJ_D=row['kdj_d'], KDJ_J=row['kdj_j'], RSI_6=row['rsi_6'],
-                                       RSI_12=row['rsi_12'],
-                                       RSI_24=row['rsi_24'], BOLL_UPPER=row['boll_upper'], BOLL_MID=row['boll_mid'],
-                                       BOLL_LOWER=row['boll_lower'],
-                                       CCI=row['cci'])
+                                       DEA=row['dea'], MACD=row['macd'], KDJ_K=row['kdj_k'], KDJ_D=row['kdj_d'],
+                                       KDJ_J=row['kdj_j'], RSI_6=row['rsi_6'],
+                                       RSI_12=row['rsi_12'], RSI_24=row['rsi_24'], BOLL_UPPER=row['boll_upper'],
+                                       BOLL_MID=row['boll_mid'], BOLL_LOWER=row['boll_lower'], CCI=row['cci'])
             try:
                 # 查询数据库中是否已存在该条数据
                 existing_indicator = mult_session.query(HmIndicatorDay).filter_by(CODE=indicator.CODE,
@@ -716,10 +712,10 @@ def get_all_index_daily(start_date=None, end_date=None):
         print(df.head(1))
         index_daily = []
         for index, row in df.iterrows():
-            model = HmTuIndexDaily(CODE=row['code'], DATE=row['date'], close=row['close'],
-                                   open=row['open'], high=row['high'], low=row['low'], pre_close=row['pre_close'],
-                                   change=row['change'], pct_chg=row['pct_chg'], vol=row['vol'],
-                                   amount=Utils.convert_value(row['amount'], 1000))
+            model = HmTuIndexDaily(CODE=row['code'], DATE=row['date'], CLOSE=row['close'], OPEN=row['open'],
+                                   HIGH=row['high'], LOW=row['low'], PRE_CLOSE=row['pre_close'], CHANGE=row['change'],
+                                   PCT_CHG=row['pct_chg'], VOL=row['vol'],
+                                   AMOUNT=Utils.convert_value(row['amount'], 1000))
             index_daily.append(model)
 
         mult_session.add_all(index_daily)
@@ -771,7 +767,7 @@ def multithreading_update_data():
     # threads.append(t6)
     #
     # log("***************** 7 股票技术因子（量化因子）入库 ***************")
-    trade_end_date = "20220511"
+    trade_end_date = "20220322"
     # trade_end_date = "20230414"
     # trade_end_date = None
     t7 = threading.Thread(target=get_stock_stk_factor, args=(trade_end_date,))
@@ -794,7 +790,7 @@ def multithreading_update_data():
 
 if __name__ == '__main__':
     tushareApi = TushareAPI()
-    # engine = init_db_dev()
+    engine = init_db_dev()
     engine = init_db_pre()
     Session = scoped_session(sessionmaker(bind=engine))
     multithreading_update_data()

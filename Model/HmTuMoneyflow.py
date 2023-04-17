@@ -5,7 +5,7 @@
 # @File : HmTuMoneyflow.py
 # @Project : 东方财富OCR
 
-from sqlalchemy import Column, Integer, String, Date, Float, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Date, Float, UniqueConstraint, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 from Model.BaseModel import BaseModel
@@ -19,24 +19,26 @@ class HmTuMoneyflow(BaseModel):
     CODE = Column(String(10), nullable=False, comment='TS代码')
     # date = Column(Date, nullable=False, comment='交易日期')
     DATE = Column(String(255), nullable=True, comment='交易日期')
-    buy_sm_vol = Column(Integer, comment='小单买入量（手）')
-    buy_sm_amount = Column(Float, comment='小单买入金额（元）')
-    sell_sm_vol = Column(Integer, comment='小单卖出量（手）')
-    sell_sm_amount = Column(Float, comment='小单卖出金额（元）')
-    buy_md_vol = Column(Integer, comment='中单买入量（手）')
-    buy_md_amount = Column(Float, comment='中单买入金额（元）')
-    sell_md_vol = Column(Integer, comment='中单卖出量（手）')
-    sell_md_amount = Column(Float, comment='中单卖出金额（元）')
-    buy_lg_vol = Column(Integer, comment='大单买入量（手）')
-    buy_lg_amount = Column(Float, comment='大单买入金额（元）')
-    sell_lg_vol = Column(Integer, comment='大单卖出量（手）')
-    sell_lg_amount = Column(Float, comment='大单卖出金额（元）')
-    buy_elg_vol = Column(Integer, comment='特大单买入量（手）')
-    buy_elg_amount = Column(Float, comment='特大单买入金额（元）')
-    sell_elg_vol = Column(Integer, comment='特大单卖出量（手）')
-    sell_elg_amount = Column(Float, comment='特大单卖出金额（元）')
-    net_mf_vol = Column(Integer, comment='净流入量（手）')
-    net_mf_amount = Column(Float, comment='净流入额（元）')
+    BUY_SM_VOL = Column(Integer, comment='小单买入量（手）')
+    BUY_SM_AMOUNT = Column(Float, comment='小单买入金额（元）')
+    SELL_SM_VOL = Column(Integer, comment='小单卖出量（手）')
+    SELL_SM_AMOUNT = Column(Float, comment='小单卖出金额（元）')
+    BUY_MD_VOL = Column(Integer, comment='中单买入量（手）')
+    BUY_MD_AMOUNT = Column(Float, comment='中单买入金额（元）')
+    SELL_MD_VOL = Column(Integer, comment='中单卖出量（手）')
+    SELL_MD_AMOUNT = Column(Float, comment='中单卖出金额（元）')
+    BUY_LG_VOL = Column(Integer, comment='大单买入量（手）')
+    BUY_LG_AMOUNT = Column(Float, comment='大单买入金额（元）')
+    SELL_LG_VOL = Column(Integer, comment='大单卖出量（手）')
+    SELL_LG_AMOUNT = Column(Float, comment='大单卖出金额（元）')
+    BUY_ELG_VOL = Column(Integer, comment='特大单买入量（手）')
+    BUY_ELG_AMOUNT = Column(Float, comment='特大单买入金额（元）')
+    SELL_ELG_VOL = Column(Integer, comment='特大单卖出量（手）')
+    SELL_ELG_AMOUNT = Column(Float, comment='特大单卖出金额（元）')
+    NET_MF_VOL = Column(Integer, comment='净流入量（手）')
+    NET_MF_AMOUNT = Column(Float, comment='净流入额（元）')
+    UPDATE_TIME = Column(DateTime, nullable=False, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                         comment='更新时间')
 
     __table_args__ = (
         UniqueConstraint('CODE', 'DATE', name='唯一'),
