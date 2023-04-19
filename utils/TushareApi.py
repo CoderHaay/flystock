@@ -25,7 +25,7 @@ class TushareAPI:
         :return: pandas.DataFrame
         """
         if fields is None:
-            fields = ["ts_code", "symbol", "name", "area", "industry", "FULLNAME",
+            fields = ["ts_code", "symbol", "name", "area", "industry", "fullname",
                       "enname", "cnspell", "market", "exchange", "curr_type",
                       "list_status", "list_date", "delist_date", "is_hs"
                       ]
@@ -67,6 +67,21 @@ class TushareAPI:
             fields = ['trade_date', 'ggt_ss', 'ggt_sz', 'hgt', 'sgt', 'north_money', 'south_money']
         return self.pro.moneyflow_hsgt(trade_date=trade_date, start_date=start_date, end_date=end_date,
                                        limit=limit, offset=offset, fields=fields)
+
+    def get_hk_hold(self, ts_code='', trade_date='', start_date='', end_date='', exchange='', limit='', offset='',
+                    fields=None):
+        """
+        沪深港股通持股明细
+        接口：hk_hold，可以通过数据工具调试和查看数据。
+        描述：获取沪深港股通持股明细，数据来源港交所。
+        限量：单次最多提取3800条记录，可循环调取，总量不限制
+        积分：用户积120积分可调取试用，2000积分可正常使用，单位分钟有流控，积分越高流量越大，请自行提高积分，具体请参阅积分获取办法
+        """
+
+        if fields is None:
+            fields = ['trade_date', 'ts_code', 'name', 'vol', 'ratio', 'exchange']
+        return self.pro.hk_hold(code="", ts_code=ts_code, trade_date=trade_date, start_date=start_date,
+                                end_date=end_date, exchange=exchange, limit=limit, offset=offset, fields=fields)
 
     # 每分钟内最多调取500次，每次6000条数据
     def get_stock_daily(self, ts_code='', trade_date='', start_date='', end_date='', fields=None):
@@ -167,7 +182,7 @@ class TushareAPI:
         """
         if fields is None:
             fields = ["ts_code", "name", "market", "publisher", "category", "base_date", "base_point", "list_date",
-                      "FULLNAME", "index_type", "weight_rule", "desc", "exp_date"]
+                      "fullname", "index_type", "weight_rule", "desc", "exp_date"]
 
         return self.pro.index_basic(ts_code=ts_code, market=market, publisher=publisher, category=category, name=name,
                                     limit=limit, offset=offset, fields=fields)
